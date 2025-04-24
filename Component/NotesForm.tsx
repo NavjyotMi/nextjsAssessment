@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
+import axios from "axios";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const tags = ["important", "work", "personal"];
 
@@ -11,28 +13,50 @@ export default function NoteForm() {
   const [errors, setErrors] = useState<{ title?: string; note?: string }>({});
   const [submitted, setSubmitted] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      title,
+      note,
+      tag,
+    }: {
+      title: string;
+      note: string;
+      tag: string;
+    }) => {
+      const userId = localStorage.getItem("user_id");
+      const res = await axios.post("/api/notes", {
+        title,
+        content: note,
+        tag,
+        user_id: userId,
+      });
+      return res.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] });
+      setTitle("");
+      setNote("");
+      setTag("");
+      setErrors({});
+      setSubmitted(true);
+      setTimeout(() => setSubmitted(false), 2000);
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("Submit triggered");
 
-    let errs: any = {};
+    const errs: { title?: string; note?: string } = {};
     if (!title.trim()) errs.title = "Title is required";
     if (!note.trim()) errs.note = "Note is required";
     setErrors(errs);
-
     if (Object.keys(errs).length > 0) return;
 
-    // Mock submit logic
-    console.log("Submitted Note:", { title, note, tag });
-
-    // Clear form after submission
-    setTitle("");
-    setNote("");
-    setTag("");
-    setErrors({});
-    setSubmitted(true);
-
-    // Optional: Reset submission confirmation
-    setTimeout(() => setSubmitted(false), 2000);
+    console.log("Calling mutation...");
+    mutation.mutate({ title, note, tag });
   };
 
   return (
@@ -84,9 +108,10 @@ export default function NoteForm() {
 
       <button
         type="submit"
+        disabled={mutation.isPending}
         className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-900 transition"
       >
-        Add Note
+        {mutation.isPending ? "Adding..." : "Add Note"}
       </button>
 
       {submitted && (

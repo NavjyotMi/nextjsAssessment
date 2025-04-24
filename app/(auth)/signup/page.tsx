@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { supabase } from "@/library/supabaseClient";
 
 export default function Signup() {
@@ -72,9 +71,8 @@ export default function Signup() {
     setLoading(false);
     console.log("Google Sign-In data:", data);
     if (error) {
-      toast.error(error.message);
+      setError(error.message);
     } else {
-      toast.success("Google Sign-In Successful!");
       router.push("/dashboard"); // Redirect to the dashboard after login
     }
   };
