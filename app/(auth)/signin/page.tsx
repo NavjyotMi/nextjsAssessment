@@ -10,19 +10,15 @@ export default function SignIn() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-
   // Handle form submission
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
-
     setLoading(false);
-
     if (error) {
       if (error.message.includes("Invalid login credentials")) {
         console.log(error.message);
@@ -35,7 +31,6 @@ export default function SignIn() {
       }
     } else {
       console.log("User signed in:", data?.user);
-
       const { data: sessionData, error: sessionError } =
         await supabase.auth.getSession();
       if (sessionError) {
@@ -44,7 +39,6 @@ export default function SignIn() {
         console.log("Session data after sign up:", sessionData);
         if (sessionData?.session) {
           const jwt = sessionData.session.access_token;
-
           const userId = data?.user?.id;
           if (userId) {
             localStorage.setItem("supabase_jwt", jwt);
@@ -59,7 +53,6 @@ export default function SignIn() {
       }
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col justify-center bg-gray-100 px-4 py-12">
       <div className="max-w-md mx-auto bg-white p-8 rounded-lg shadow-lg">
@@ -83,7 +76,6 @@ export default function SignIn() {
               className="w-full px-4 py-2 border rounded-lg mt-2 focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           <div>
             <label htmlFor="password" className="block text-gray-700">
               Password
@@ -99,7 +91,6 @@ export default function SignIn() {
               className="w-full px-4 py-2 border rounded-lg mt-2 focus:ring-2 focus:ring-blue-500"
             />
           </div>
-
           <button
             type="submit"
             className={`w-full py-3 bg-blue-600 text-white rounded-lg mt-4 hover:bg-blue-700 focus:outline-none transition duration-300 ${
@@ -110,7 +101,6 @@ export default function SignIn() {
             {loading ? "Signing In..." : "Sign In"}
           </button>
         </form>
-
         <div className="my-4 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}

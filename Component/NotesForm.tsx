@@ -1,6 +1,6 @@
 "use client";
 
-import { use, useState } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -109,7 +109,7 @@ export default function NoteForm() {
       <button
         type="submit"
         disabled={mutation.isPending}
-        className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-900 transition"
+        className="w-full bg-black text-white py-2 px-4 rounded-lg hover:bg-gray-900 transition cursor-pointer"
       >
         {mutation.isPending ? "Adding..." : "Add Note"}
       </button>
