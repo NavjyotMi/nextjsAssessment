@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import { supabase } from "@/library/supabaseClient";
 
 export default function SignIn() {
