@@ -4,8 +4,6 @@ import React from "react";
 import NoteForm from "@/Component/NotesForm";
 import AllNotes from "@/Component/AllNotes";
 
-AllNotes;
-// AllNotes
 export default function dashboard() {
   function handleLogout() {
     localStorage.removeItem("supabase_jwt");

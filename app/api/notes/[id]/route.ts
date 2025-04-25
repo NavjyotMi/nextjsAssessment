@@ -1,7 +1,7 @@
 import { supabase } from "@/library/supabaseClient";
 import {} from "next";
 import { NextRequest, NextResponse } from "next/server";
-NextRequest;
+
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -40,7 +40,7 @@ export async function PUT(
     ...(tag && { tag }),
   };
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("notes")
     .update(updateData)
     .eq("id", id)

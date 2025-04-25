@@ -34,10 +34,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  let summary = `${content.slice(0, 100)}.....`;
+  const summary = `${content.slice(0, 100)}.....`;
   // Generate summary from content
   console.log("The summary is", summary);
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("notes")
     .insert([
       {
