@@ -63,18 +63,14 @@ export default function Signup() {
   };
 
   // Handle Google Sign-In
+  // Handle Google Sign-In
   const handleGoogleSignIn = async () => {
-    setLoading(true);
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/callback`, // or /dashboard if you want
+      },
     });
-    setLoading(false);
-    console.log("Google Sign-In data:", data);
-    if (error) {
-      setError(error.message);
-    } else {
-      router.push("/dashboard"); // Redirect to the dashboard after login
-    }
   };
 
   return (
