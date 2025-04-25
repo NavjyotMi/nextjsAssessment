@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type EditNoteModalProps = {
@@ -20,6 +20,7 @@ const updateNote = async (
     body: JSON.stringify(updatedData),
   });
 };
+
 export default function EditNoteModal({
   note,
   setIsOpen,
@@ -28,8 +29,15 @@ export default function EditNoteModal({
   const [title, setTitle] = useState(note.title);
   const [noteText, setNoteText] = useState(note.content);
   const [tag, setTag] = useState(note.tag);
+  const [userId, setUserId] = useState<string | null>(null);
   const queryClient = useQueryClient();
-  const userId = localStorage.getItem("user_id") || "";
+
+  // Use useEffect to safely access localStorage only on the client side
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    setUserId(storedUserId);
+  }, []); // Only run once when component mounts
+
   const mutation = useMutation({
     mutationFn: ({
       noteId,
@@ -37,20 +45,23 @@ export default function EditNoteModal({
     }: {
       noteId: number;
       updatedData: any;
-    }) => updateNote(noteId, updatedData, userId),
+    }) => updateNote(noteId, updatedData, userId || ""), // Ensure userId is passed even if it's null
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notes"] }); // to refetch the list
+      queryClient.invalidateQueries({ queryKey: ["notes"] }); // Refetch the notes after update
     },
   });
+
   const handleSubmit = () => {
+    if (!userId) {
+      // Handle the case where userId is not available
+      alert("User ID not found.");
+      return;
+    }
+
     console.log("Updated note:", { title, noteText, tag });
     mutation.mutate({
       noteId: note.id,
-      updatedData: {
-        title,
-        content: noteText,
-        tag,
-      },
+      updatedData: { title, content: noteText, tag },
     });
 
     setIsOpen(false);

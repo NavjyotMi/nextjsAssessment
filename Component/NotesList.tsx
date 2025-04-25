@@ -1,5 +1,6 @@
-// NoteItem.tsx
-import React, { useState } from "react";
+"use client";
+
+import React, { useState, useEffect } from "react";
 import EditNoteModal from "./EditModal";
 import Summarization from "./Summarization";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -23,13 +24,31 @@ const NoteItem = ({ note }: NoteItemProps) => {
   const [open, setIsOpen] = useState<boolean>(false);
   const [summarizedNote, setSummarizedNote] = useState<boolean>(false);
   const [seeContent, setSeeContent] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null); // State to store userId
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Check for user_id in localStorage only when on the client-side
+    if (typeof window !== "undefined") {
+      const storedUserId = localStorage.getItem("user_id");
+      if (storedUserId) {
+        setUserId(storedUserId);
+      } else {
+        console.error("User is not authenticated, no user_id in localStorage.");
+        // Handle redirection or show a message if necessary
+      }
+    }
+  }, []);
+
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const userId = localStorage.getItem("user_id");
+      if (!userId) {
+        throw new Error("User is not authenticated");
+      }
+
       const res = await axios.delete(`/api/notes/${id}`, {
         headers: {
-          "X-User-Id": userId,
+          "X-User-Id": userId, // Pass the user ID in headers for authentication
         },
       });
       return res.data;
@@ -43,6 +62,7 @@ const NoteItem = ({ note }: NoteItemProps) => {
     setSummarizedNote(false);
     setIsOpen(true);
   }
+
   // Summarize note content
   const handleSummarize = () => {
     setSummarizedNote(!summarizedNote);
@@ -50,6 +70,7 @@ const NoteItem = ({ note }: NoteItemProps) => {
   const handleSeeContent = () => {
     setSeeContent(!seeContent);
   };
+
   return (
     <div
       key={note.id}
@@ -67,9 +88,9 @@ const NoteItem = ({ note }: NoteItemProps) => {
       </div>
 
       {seeContent ? (
-        <p className="text-gray-600 mt-2">{note.summary}</p>
-      ) : (
         <p className="text-gray-600 mt-2">{note.content}</p>
+      ) : (
+        <p className="text-gray-600 mt-2">{note.summary}</p>
       )}
       <div className="flex gap-4 mt-4">
         <button
@@ -85,7 +106,13 @@ const NoteItem = ({ note }: NoteItemProps) => {
           Edit
         </button>
         <button
-          onClick={() => deleteMutation.mutate(note.id)}
+          onClick={() => {
+            if (userId) {
+              deleteMutation.mutate(note.id);
+            } else {
+              alert("You must be logged in to delete notes.");
+            }
+          }}
           className="px-4 py-2 text-sm text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200 cursor-pointer"
         >
           Delete

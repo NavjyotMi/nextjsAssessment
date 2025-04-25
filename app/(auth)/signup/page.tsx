@@ -43,7 +43,7 @@ export default function Signup() {
         if (sessionData?.session) {
           const jwt = sessionData.session.access_token;
           const userId = data?.user?.id;
-          if (userId) {
+          if (typeof window !== "undefined" && userId) {
             localStorage.setItem("supabase_jwt", jwt);
             localStorage.setItem("user_id", userId);
           }

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import NoteItem from "./NotesList";
+import { useEffect, useState } from "react";
 type Note = {
   id: number;
   title: string;
@@ -14,7 +15,11 @@ type Note = {
 };
 
 export default function AllNotes() {
-  const userId = localStorage.getItem("user_id");
+  const [userId, setUserId] = useState<string | null>(null);
+  useEffect(() => {
+    const storedUserId = localStorage.getItem("user_id");
+    setUserId(storedUserId); // Set the userId once the component mounts
+  }, []);
 
   const {
     data: notes,

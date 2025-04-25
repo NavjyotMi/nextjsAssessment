@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/library/supabaseClient";
 
@@ -10,6 +10,8 @@ export default function SignIn() {
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [session, setSession] = useState<any>(null); // Store the session for later use
+
   // Handle form submission
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,20 +35,25 @@ export default function SignIn() {
       if (sessionError) {
         setError("Failed to retrieve session data.");
       } else {
-        if (sessionData?.session) {
-          const jwt = sessionData.session.access_token;
-          const userId = data?.user?.id;
-          if (userId) {
-            localStorage.setItem("supabase_jwt", jwt);
-            localStorage.setItem("user_id", userId);
-          }
-          router.push("/dashboard");
-        } else {
-          setError("No session available after sign-up.");
-        }
+        setSession(sessionData?.session); // Store session in state
       }
     }
   };
+
+  // Ensure localStorage is only accessed client-side
+  useEffect(() => {
+    if (typeof window !== "undefined" && session) {
+      // Only access localStorage on the client side
+      const jwt = session.access_token;
+      const userId = session.user?.id;
+      if (userId && jwt) {
+        localStorage.setItem("supabase_jwt", jwt);
+        localStorage.setItem("user_id", userId);
+        router.push("/dashboard");
+      }
+    }
+  }, [session, router]); // Add session to dependency array
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f9fafb] px-4 py-12">
       <div className="w-full max-w-md bg-white p-8 rounded-lg shadow-lg">

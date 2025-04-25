@@ -1,19 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 const tags = ["important", "work", "personal"];
 
 export default function NoteForm() {
-  const [title, setTitle] = useState("");
-  const [note, setNote] = useState("");
-  const [tag, setTag] = useState("");
+  const [title, setTitle] = useState<string>("");
+  const [note, setNote] = useState<string>("");
+  const [tag, setTag] = useState<string>("");
   const [errors, setErrors] = useState<{ title?: string; note?: string }>({});
   const [submitted, setSubmitted] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null); // State to store user ID
 
   const queryClient = useQueryClient();
+
+  useEffect(() => {
+    // Check if we're in the client-side and if user_id exists in localStorage
+    const storedUserId = localStorage.getItem("user_id");
+    if (storedUserId) {
+      setUserId(storedUserId);
+    } else {
+      // Handle case where user_id is not in localStorage
+      console.error("User not authenticated, no user_id in localStorage.");
+    }
+  }, []);
 
   const mutation = useMutation({
     mutationFn: async ({
@@ -25,7 +37,10 @@ export default function NoteForm() {
       note: string;
       tag: string;
     }) => {
-      const userId = localStorage.getItem("user_id");
+      if (!userId) {
+        throw new Error("User is not authenticated");
+      }
+
       const res = await axios.post("/api/notes", {
         title,
         content: note,
@@ -43,11 +58,13 @@ export default function NoteForm() {
       setSubmitted(true);
       setTimeout(() => setSubmitted(false), 2000);
     },
+    onError: (error: any) => {
+      alert(`Error: ${error.message || "Something went wrong!"}`);
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submit triggered");
 
     const errs: { title?: string; note?: string } = {};
     if (!title.trim()) errs.title = "Title is required";
@@ -55,7 +72,6 @@ export default function NoteForm() {
     setErrors(errs);
     if (Object.keys(errs).length > 0) return;
 
-    console.log("Calling mutation...");
     mutation.mutate({ title, note, tag });
   };
 
@@ -118,7 +134,7 @@ export default function NoteForm() {
 
       <button
         type="submit"
-        disabled={mutation.isPending}
+        disabled={mutation.isPending || !userId} // Disable button if no user ID
         className="w-full py-3 px-4 rounded-md bg-black text-white font-semibold hover:bg-gray-800 transition-all duration-300 disabled:opacity-50 cursor-pointer"
       >
         {mutation.isPending ? "Adding..." : "Add Note"}
