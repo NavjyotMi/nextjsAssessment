@@ -7,7 +7,7 @@ This is a simple SignIn application built with Next.js and Supabase. It demonstr
 
 - Sign In: Users can sign in using their email and password.
 - Session Management: After a successful sign-in, the user's session is saved in the browser and used for subsequent authentication.
-
+[Demo](https://nextjs-assessment-smoky.vercel.app/)
 
 ## Technologies Used
 - Next.js: A React framework for server-rendered applications.
