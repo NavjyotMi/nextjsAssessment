@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const id = context.params.id;
+  const id = params.id;
 
   const userId = req.headers.get("x-user-id");
 
@@ -25,9 +25,9 @@ export async function DELETE(
 
 export async function PUT(
   req: NextRequest,
-  context: { params: { id: string } }
+  { params }: { params: { id: string } }
 ) {
-  const id = context.params.id;
+  const id = params.id;
 
   const { title, content, tag } = await req.json();
   const userId = req.headers.get("x-user-id");
