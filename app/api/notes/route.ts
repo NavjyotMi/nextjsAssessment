@@ -5,13 +5,12 @@ import { NextResponse } from "next/server";
 // GET all notes
 export async function GET(req: Request) {
   const userId = req.headers.get("x-user-id");
-  // console.log("User ID:", userId); // Log the user ID for debugging
+
   try {
     const { data, error } = await supabase
       .from("notes")
       .select("*")
       .eq("user_id", userId);
-    // console.log(data);
     if (error) {
       console.error("Error fetching notes:", error.message);
       return new NextResponse("Error fetching notes", { status: 500 });
@@ -29,13 +28,14 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { title, content, tag, user_id } = body;
 
-  if (!user_id) return NextResponse.json({ message: "No user Id" }); // Log the request body for debugging
+  if (!user_id) return NextResponse.json({ message: "No user Id" });
 
   if (!title || !content) {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
 
-  const summary = content.slice(0, 40); // Generate summary from content
+  let summary = `${content.slice(0, 100)}.....`;
+  // Generate summary from content
   console.log("The summary is", summary);
   const { data, error } = await supabase
     .from("notes")
@@ -57,7 +57,6 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-  console.log("Data:", data); // Log the response data for debugging
 
   return NextResponse.json({ message: "Success", status: 201 });
 }

@@ -5,48 +5,34 @@ export default function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="h-screen bg-gray-900 text-white flex flex-col justify-center items-center text-center py-12">
-        <h1 className="text-5xl font-bold mb-4">Welcome to MyApp</h1>
-        <p className="text-xl mb-8">
-          A simple, modern, and responsive Next.js application.
+      <section className="h-screen bg-gray-950 text-white flex flex-col justify-center items-center text-center px-4 sm:px-8">
+        <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
+          Summarize Your Notes.
+          <br />
+          Stay Organized Effortlessly.
+        </h1>
+
+        <p className="text-lg sm:text-xl text-gray-300 max-w-2xl mb-10">
+          MyApp lets you turn your messy notes into clean, concise summaries
+          using AI. All your ideas, structured and searchable—instantly.
         </p>
+
+        <ul className="text-gray-400 text-base sm:text-lg space-y-2 mb-10">
+          <li>✔ Summarize long notes in one click</li>
+          <li>✔ Automatically categorize by topic</li>
+          <li>✔ Minimal interface, zero distractions</li>
+        </ul>
+
         <Link href="/signup">
-          <Button label="Get Started" />
+          <button className="bg-white text-gray-900 font-semibold px-6 py-3 rounded-xl shadow hover:bg-gray-200 active:bg-gray-300 transition duration-200 cursor-pointer">
+            Get Started
+          </button>
         </Link>
       </section>
 
-      {/* Features Section */}
-      <section className="py-20 bg-white text-gray-900">
-        <div className="max-w-7xl mx-auto text-center">
-          <h2 className="text-4xl font-semibold mb-12">Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="flex flex-col items-center">
-              <h3 className="text-2xl font-semibold mb-4">Feature 1</h3>
-              <p className="text-lg text-gray-600">
-                Explanation of feature 1 goes here.
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <h3 className="text-2xl font-semibold mb-4">Feature 2</h3>
-              <p className="text-lg text-gray-600">
-                Explanation of feature 2 goes here.
-              </p>
-            </div>
-            <div className="flex flex-col items-center">
-              <h3 className="text-2xl font-semibold mb-4">Feature 3</h3>
-              <p className="text-lg text-gray-600">
-                Explanation of feature 3 goes here.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer Section */}
-      <footer className="bg-gray-800 text-white py-6">
-        <div className="max-w-7xl mx-auto text-center">
-          <p>&copy; 2025 MyApp. All rights reserved.</p>
-        </div>
+      {/* Footer */}
+      <footer className="bg-gray-900 text-gray-400 py-6 text-sm text-center">
+        <p>&copy; 2025 MyApp. Built for clarity.</p>
       </footer>
     </div>
   );

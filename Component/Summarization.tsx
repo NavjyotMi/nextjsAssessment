@@ -18,7 +18,6 @@ export default function Summarization({ note }: SummarizationProps) {
     }
     summarizeText(note);
   }, []);
-  console.log("Summarization component rendered with note:", note);
 
   return (
     <>

@@ -10,10 +10,13 @@ export async function DELETE(
 
   const userId = req.headers.get("x-user-id");
 
-  const { error } = await supabase.from("notes").delete().eq("id", id);
+  const { error } = await supabase
+    .from("notes")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (error) {
-    console.log("Error deleting note:", error.message);
     return NextResponse.json({ error: error.message });
   }
 
@@ -24,13 +27,12 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  console.log("PUT request received");
   const { id } = await params;
 
   const { title, content, tag } = await req.json();
   const userId = req.headers.get("x-user-id");
 
-  const summary = content.slice(0, 100);
+  const summary = `${content.slice(0, 100)}.....`;
   const updateData = {
     title: title,
     content: content,
@@ -45,7 +47,6 @@ export async function PUT(
     .eq("user_id", userId);
 
   if (error) {
-    console.log("Error updating note:", error.message);
     return NextResponse.json({ error: error.message });
   }
 
