@@ -2,9 +2,10 @@
 
 import React from "react";
 import NoteForm from "@/Component/NotesForm";
-// import NotesList from "@/Component/getNotes";
-import NotesList from "@/Component/GetNotes";
+import AllNotes from "@/Component/AllNotes";
 
+AllNotes;
+// AllNotes
 export default function dashboard() {
   function handleLogout() {
     localStorage.removeItem("supabase_jwt");
@@ -23,7 +24,7 @@ export default function dashboard() {
       </div>
       <NoteForm />
       <br></br>
-      <NotesList />
+      <AllNotes />
     </div>
   );
 }

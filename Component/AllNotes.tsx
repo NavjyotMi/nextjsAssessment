@@ -1,4 +1,4 @@
-"use client";
+// "use client";
 
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -13,7 +13,7 @@ type Note = {
   summary: string;
 };
 
-export default function NotesList() {
+export default function AllNotes() {
   const userId = localStorage.getItem("user_id");
 
   const {
@@ -37,7 +37,6 @@ export default function NotesList() {
   if (isLoading) return <p>Loading notes...</p>;
   if (isError) return <p>Error: {(error as Error).message}</p>;
 
-  NotesList;
   return (
     <div className="p-4 space-y-4">
       {notes && notes.length > 0 ? (
