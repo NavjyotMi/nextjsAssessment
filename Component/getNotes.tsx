@@ -2,8 +2,9 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditNoteModal from "./EditModal";
+import Summarization from "./Summarization";
 
 type Note = {
   id: number;
@@ -11,15 +12,22 @@ type Note = {
   content: string;
   tag: string;
   user_id: string;
+  summary: string;
 };
 
 export default function NotesList() {
-  const [summarizedNote, setSummarizedNote] = useState<string | null>(null);
-  const [open, setIsOpen] = useState(false);
-  const queryClient = useQueryClient();
-  const userId =
-    typeof window !== "undefined" ? localStorage.getItem("user_id") : null;
+  const [summarizedNote, setSummarizedNote] = useState<boolean>(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [open, setIsOpen] = useState<boolean>(false);
 
+  const queryClient = useQueryClient();
+  // const userId = localStorage.getItem("user_id");
+
+  useEffect(() => {
+    // Ensure this code runs only on the client-side
+    const storedUserId = localStorage.getItem("user_id");
+    setUserId(storedUserId);
+  }, []);
   // Fetching notes using React Query
   const {
     data: notes,
@@ -38,7 +46,7 @@ export default function NotesList() {
     },
     enabled: !!userId, // Only run query if jwt and userId are available
   });
-
+  // console.log("Fetched notes:", notes);
   // Mutation for deleting notes
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
@@ -56,10 +64,15 @@ export default function NotesList() {
     },
   });
 
+  function editHandler(open: boolean) {
+    console.log("Edit button clicked");
+    setIsOpen(open);
+  }
+
   // Summarize note content
-  const handleSummarize = (content: string) => {
-    const summary = content.split(".").slice(0, 1).join(".") + ".";
-    setSummarizedNote(summary);
+  const handleSummarize = () => {
+    setSummarizedNote(!summarizedNote);
+    // setSummarizedNote(summary);
   };
 
   if (isLoading) return <p>Loading notes...</p>;
@@ -77,22 +90,13 @@ export default function NotesList() {
             <p className="text-gray-700">{note.content}</p>
             <div className="flex gap-3 mt-3">
               <button
-                onClick={() => setIsOpen(true)} // Set modal open
+                onClick={() => {
+                  editHandler(true);
+                }} // Set modal open
                 className="px-3 py-1 text-sm bg-blue-500 text-white rounded-md cursor-pointer"
               >
                 Edit
               </button>
-              {open && (
-                <EditNoteModal
-                  note={{
-                    title: note.title,
-                    content: note.content,
-                    tag: note.tag,
-                    id: note.id, // Use note.id here instead of note.user_id
-                  }}
-                  setIsOpen={setIsOpen}
-                />
-              )}
               <button
                 onClick={() => deleteMutation.mutate(note.id)}
                 className="px-3 py-1 text-sm bg-red-500 text-white rounded-md cursor-pointer"
@@ -100,22 +104,37 @@ export default function NotesList() {
                 Delete
               </button>
               <button
-                onClick={() => handleSummarize(note.content)}
+                onClick={handleSummarize}
                 className="px-3 py-1 text-sm bg-yellow-500 text-white rounded-md  cursor-pointer"
               >
                 Summarize
               </button>
             </div>
+            {open && (
+              <EditNoteModal
+                note={{
+                  title: note.title,
+                  content: note.content,
+                  tag: note.tag,
+                  id: note.id,
+                }}
+                setIsOpen={editHandler}
+                open={open}
+              />
+            )}
+            {
+              summarizedNote && <Summarization note={note.content} /> // Display summarized note
+            }
           </div>
         ))
       ) : (
         <p>No notes available.</p>
       )}
-      {summarizedNote && (
+      {/* {summarizedNote && (
         <div className="mt-4 p-4 bg-yellow-100 rounded-md">
           <strong>Summary:</strong> {summarizedNote}
         </div>
-      )}
+      )} */}
     </div>
   );
 }

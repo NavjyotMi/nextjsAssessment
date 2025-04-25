@@ -24,16 +24,30 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  console.log("PUT request received");
   const { id } = await params;
 
+  const { title, content, tag } = await req.json();
   const userId = req.headers.get("x-user-id");
 
-  const { error } = await supabase.from("notes").delete().eq("id", id);
+  const summary = content.slice(0, 100);
+  const updateData = {
+    title: title,
+    content: content,
+    summary: summary,
+    ...(tag && { tag }),
+  };
+
+  const { data, error } = await supabase
+    .from("notes")
+    .update(updateData)
+    .eq("id", id)
+    .eq("user_id", userId);
 
   if (error) {
-    console.log("Error deleting note:", error.message);
+    console.log("Error updating note:", error.message);
     return NextResponse.json({ error: error.message });
   }
 
-  return NextResponse.json({ message: "Note deleted successfully" });
+  return NextResponse.json({ message: "Note updated successfully" });
 }

@@ -1,24 +1,61 @@
 "use client";
 
 import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 type EditNoteModalProps = {
-  note: { id: string; title: string; content: string; tag: string };
+  note: { id: number; title: string; content: string; tag: string };
   setIsOpen: (open: boolean) => void;
+  open: boolean;
 };
 
-export default function EditNoteModal({ note, setIsOpen }: EditNoteModalProps) {
+const updateNote = async (
+  noteId: number,
+  updatedData: { title: string; content: string; tag: string },
+  userId: string
+) => {
+  const res = await fetch(`/api/notes/${noteId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", "X-User-Id": userId },
+    body: JSON.stringify(updatedData),
+  });
+};
+export default function EditNoteModal({
+  note,
+  setIsOpen,
+  open,
+}: EditNoteModalProps) {
   const [title, setTitle] = useState(note.title);
   const [noteText, setNoteText] = useState(note.content);
   const [tag, setTag] = useState(note.tag);
-  console.log("Note data:", note);
-  // Handle submit
+  const queryClient = useQueryClient();
+  const userId = localStorage.getItem("user_id") || "";
+  const mutation = useMutation({
+    mutationFn: ({
+      noteId,
+      updatedData,
+    }: {
+      noteId: number;
+      updatedData: any;
+    }) => updateNote(noteId, updatedData, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes"] }); // to refetch the list
+    },
+  });
   const handleSubmit = () => {
     console.log("Updated note:", { title, noteText, tag });
-    setIsOpen(false); // Close the modal after saving
+    mutation.mutate({
+      noteId: note.id,
+      updatedData: {
+        title,
+        content: noteText,
+        tag,
+      },
+    });
+
+    setIsOpen(false);
   };
 
-  // Handle cancel (close modal)
   const handleCancel = () => {
     setIsOpen(false);
   };
@@ -29,10 +66,6 @@ export default function EditNoteModal({ note, setIsOpen }: EditNoteModalProps) {
         <div className="bg-white p-6 rounded-lg w-96">
           <h2 className="text-2xl font-semibold mb-4">Edit Note</h2>
 
-          {/* Display note data */}
-          <div className="mb-4">
-            <strong>ID:</strong> <p>{note.id}</p>
-          </div>
           <div className="mb-4">
             <strong>Title:</strong>
             <input
@@ -52,18 +85,23 @@ export default function EditNoteModal({ note, setIsOpen }: EditNoteModalProps) {
               placeholder="Note content"
             />
           </div>
-          <div className="mb-4">
-            <strong>Tag:</strong>
-            <input
-              type="text"
+          <div>
+            <select
               value={tag}
               onChange={(e) => setTag(e.target.value)}
               className="border p-2 w-full"
-              placeholder="Tag"
-            />
+            >
+              <option value="" disabled>
+                Select a tag
+              </option>
+              {["important", "work", "personal"].map((t) => (
+                <option key={t} value={t}>
+                  {t.charAt(0).toUpperCase() + t.slice(1)}
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* Modal Buttons */}
           <div className="flex justify-between">
             <button
               onClick={handleCancel}

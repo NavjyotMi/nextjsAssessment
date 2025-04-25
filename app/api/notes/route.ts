@@ -5,13 +5,13 @@ import { NextResponse } from "next/server";
 // GET all notes
 export async function GET(req: Request) {
   const userId = req.headers.get("x-user-id");
-  console.log("User ID:", userId); // Log the user ID for debugging
+  // console.log("User ID:", userId); // Log the user ID for debugging
   try {
     const { data, error } = await supabase
       .from("notes")
       .select("*")
       .eq("user_id", userId);
-    console.log(data);
+    // console.log(data);
     if (error) {
       console.error("Error fetching notes:", error.message);
       return new NextResponse("Error fetching notes", { status: 500 });

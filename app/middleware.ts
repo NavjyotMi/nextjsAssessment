@@ -38,5 +38,5 @@ export async function middleware(req: Request) {
 
 // Middleware path pattern, can be adjusted as needed
 export const config = {
-  matcher: "/app/api/:path*", //  Corrected matcher pattern
+  matcher: ["/api/:path*"], //  Corrected matcher pattern
 };
