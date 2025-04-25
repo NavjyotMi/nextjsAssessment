@@ -7,8 +7,6 @@ import AllNotes from "@/Component/AllNotes";
 export default function dashboard() {
   function handleLogout() {
     if (typeof window !== "undefined") {
-      localStorage.removeItem("supabase_jwt");
-      localStorage.removeItem("user_id");
       window.location.href = "/"; // Redirect to home or login page
     }
   }
