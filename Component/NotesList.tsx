@@ -4,7 +4,6 @@ import EditNoteModal from "./EditModal";
 import Summarization from "./Summarization";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { Span } from "next/dist/trace";
 
 type Note = {
   id: number;
@@ -36,7 +35,6 @@ const NoteItem = ({ note }: NoteItemProps) => {
       return res.data;
     },
     onSuccess: () => {
-      // Invalidate query to refetch notes
       queryClient.invalidateQueries({ queryKey: ["notes"] });
     },
   });
@@ -75,13 +73,13 @@ const NoteItem = ({ note }: NoteItemProps) => {
       )}
       <div className="flex gap-4 mt-4">
         <button
-          onClick={handleSeeContent} // Set modal open
+          onClick={handleSeeContent}
           className="px-4 py-2 text-sm text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200 cursor-pointer"
         >
           Open
         </button>
         <button
-          onClick={handleEdit} // Set modal open
+          onClick={handleEdit}
           className="px-4 py-2 text-sm text-white bg-gray-700 hover:bg-gray-600 rounded-md transition-colors duration-200 cursor-pointer"
         >
           Edit
